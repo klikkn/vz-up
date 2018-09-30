@@ -6,14 +6,14 @@ config:
 build:
 		docker-compose build
 
-build-force:
+no-cache:
 		docker-compose build --no-cache
 
 down:
 		docker-compose down
 
 all:
-    docker-compose up nginx-proxy web auth auth_db api prisma postgres
+		docker-compose up nginx-proxy web auth auth_db
 
 auth:
 		docker-compose up nginx-proxy auth auth_db
