@@ -18,6 +18,7 @@ services:
       - VIRTUAL_HOST=${WEB_HOST}
       - VIRTUAL_PORT=${WEB_EXPOSE_PORT}
       - REACT_APP_AUTH_HOST=${AUTH_HOST}
+      - NODE_ENV
     volumes:
       - ./web/:/opt/app
       - /opt/app/node_modules
@@ -26,7 +27,6 @@ services:
     build:
       context: ./auth
     command: ${AUTH_START_COMMAND}
-
     expose:
       - "${AUTH_EXPOSE_PORT}"
     environment:
@@ -34,56 +34,55 @@ services:
       - VIRTUAL_PORT=${AUTH_EXPOSE_PORT}
       - MONGO_HOST=mongodb://auth_db/auth
       - JWT_SECRET
+      - NODE_ENV
     volumes:
       - ./auth/:/opt/app
       - /opt/app/node_modules
 
   auth_db:
     image: "mongo"
-    ports:
+    expose:
       - "${AUTH_MONGO_DB}"
 
   api:
     build:
       context: ./api
-
     command: ${API_START_COMMAND}
-
     expose:
       - "${API_EXPOSE_PORT}"
-
     environment:
       - VIRTUAL_HOST=${API_HOST}
       - VIRTUAL_PORT=${API_EXPOSE_PORT}
-      - PRISMA_HOST=http://api_prisma
       - JWT_SECRET
-
+      - PRISMA_SERVICE_NAME=prisma
+      - PRISMA_HOST=http://prisma
+      - PRISMA_EXPOSE_PORT
     volumes:
       - ./api/:/opt/app
       - /opt/app/node_modules
 
-  api_prisma:
+  prisma:
     image: prismagraphql/prisma:1.16
     restart: always
-    ports:
-    - "${API_PRISMA_EXPOSE_PORT}"
+    expose:
+    - "${PRISMA_EXPOSE_PORT}"
     environment:
       PRISMA_CONFIG: |
-        port: ${API_PRISMA_EXPOSE_PORT}
+        port: ${PRISMA_EXPOSE_PORT}
         databases:
           default:
             connector: postgres
-            host: api_postgres
-            port: ${API_POSTGRES_EXPOSE_PORT}
+            host: api_db
+            port: ${API_DB_EXPOSE_PORT}
             user: ${POSTGRES_USER}
             password: ${POSTGRES_PASSWORD}
             migrations: true
 
-  api_postgres:
+  api_db:
     image: postgres
     restart: always
-    ports:
-      - "${API_POSTGRES_EXPOSE_PORT}"
+    expose:
+      - "${API_DB_EXPOSE_PORT}"
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
