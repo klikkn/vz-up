@@ -35,6 +35,8 @@ services:
       - MONGO_HOST=mongodb://auth_db/auth
       - JWT_SECRET
       - NODE_ENV
+      - AUTH_ROOT_USER_EMAIL
+      - AUTH_ROOT_USER_PASSWORD
     volumes:
       - ./auth/:/opt/app
       - /opt/app/node_modules
