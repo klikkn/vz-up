@@ -17,8 +17,9 @@ services:
     environment:
       - VIRTUAL_HOST=${WEB_HOST}
       - VIRTUAL_PORT=${WEB_EXPOSE_PORT}
-      - REACT_APP_AUTH_HOST=${AUTH_HOST}
       - NODE_ENV
+      - AUTH_HOST
+      - API_HOST
     volumes:
       - ./web/:/opt/app
       - /opt/app/node_modules
@@ -26,15 +27,15 @@ services:
   auth:
     build:
       context: ./auth
-    command: ${AUTH_START_COMMAND}
+    command: sh -c '/usr/bin/wait-for.sh auth_db:${AUTH_DB_EXPOSE_PORT} -- ${AUTH_START_COMMAND}'
     expose:
       - "${AUTH_EXPOSE_PORT}"
     environment:
       - VIRTUAL_HOST=${AUTH_HOST}
       - VIRTUAL_PORT=${AUTH_EXPOSE_PORT}
-      - MONGO_HOST=mongodb://auth_db/auth
-      - JWT_SECRET
+      - DB_HOST=mongodb://auth_db/auth
       - NODE_ENV
+      - JWT_SECRET
       - AUTH_ROOT_USER_EMAIL
       - AUTH_ROOT_USER_PASSWORD
     volumes:
@@ -43,18 +44,21 @@ services:
 
   auth_db:
     image: "mongo"
+    volumes:
+      - ./.volumes/auth_db/:/data/db
     expose:
-      - "${AUTH_MONGO_DB}"
+      - "${AUTH_DB_EXPOSE_PORT}"
 
   api:
     build:
       context: ./api
-    command: ${API_START_COMMAND}
+    command: sh -c '/usr/bin/wait-for.sh prisma:${PRISMA_EXPOSE_PORT} -- ${API_START_COMMAND}'
     expose:
       - "${API_EXPOSE_PORT}"
     environment:
       - VIRTUAL_HOST=${API_HOST}
       - VIRTUAL_PORT=${API_EXPOSE_PORT}
+      - NODE_ENV
       - JWT_SECRET
       - PRISMA_SERVICE_NAME=prisma
       - PRISMA_HOST=http://prisma
@@ -67,7 +71,7 @@ services:
     image: prismagraphql/prisma:1.16
     restart: always
     expose:
-    - "${PRISMA_EXPOSE_PORT}"
+      - "${PRISMA_EXPOSE_PORT}"
     environment:
       PRISMA_CONFIG: |
         port: ${PRISMA_EXPOSE_PORT}
@@ -82,6 +86,8 @@ services:
 
   api_db:
     image: postgres
+    volumes:
+      - ./.volumes/api_db:/var/lib/postgresql/data
     restart: always
     expose:
       - "${API_DB_EXPOSE_PORT}"
