@@ -3,6 +3,7 @@ services:
 
   nginx-proxy:
     image: jwilder/nginx-proxy
+    restart: always
     ports:
       - "80:80"
     volumes:
@@ -11,6 +12,7 @@ services:
   web:
     build:
       context: ./web
+    restart: always
     command: "${WEB_START_COMMAND}"
     expose:
       - "${WEB_EXPOSE_PORT}"
@@ -27,6 +29,7 @@ services:
   auth:
     build:
       context: ./auth
+    restart: always
     command: sh -c '/usr/bin/wait-for.sh auth_db:${AUTH_DB_EXPOSE_PORT} -- ${AUTH_START_COMMAND}'
     expose:
       - "${AUTH_EXPOSE_PORT}"
@@ -52,6 +55,7 @@ services:
   api:
     build:
       context: ./api
+    restart: always
     command: sh -c '/usr/bin/wait-for.sh prisma:${PRISMA_EXPOSE_PORT} -- ${API_START_COMMAND}'
     expose:
       - "${API_EXPOSE_PORT}"
@@ -63,6 +67,7 @@ services:
       - PRISMA_SERVICE_NAME=prisma
       - PRISMA_HOST=http://prisma
       - PRISMA_EXPOSE_PORT
+      - PRISMA_SECRET
     volumes:
       - ./api/:/opt/app
       - /opt/app/node_modules
@@ -82,10 +87,12 @@ services:
             port: ${API_DB_EXPOSE_PORT}
             user: ${POSTGRES_USER}
             password: ${POSTGRES_PASSWORD}
-            migrations: true
+            migrations: true,
+            managementApiSecret: ${PRISMA_SECRET}
 
   api_db:
     image: postgres
+    restart: always
     volumes:
       - ./.volumes/api_db:/var/lib/postgresql/data
     restart: always
