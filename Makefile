@@ -13,7 +13,16 @@ down:
 		docker-compose down
 
 up:
-	docker-compose up
+	docker-compose up -d
+
+logs:
+	docker-compose logs -f -t
+
+start:
+	docker-compose start
+
+stop:
+	docker-compose stop
 
 all:
 		docker-compose up nginx-proxy web auth auth_db api prisma api_db
