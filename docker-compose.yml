@@ -26,32 +26,6 @@ services:
       - ./web/:/opt/app
       - /opt/app/node_modules
 
-  auth:
-    build:
-      context: ./auth
-    restart: always
-    command: sh -c '/usr/bin/wait-for.sh auth_db:${AUTH_DB_EXPOSE_PORT} -- ${AUTH_START_COMMAND}'
-    expose:
-      - "${AUTH_EXPOSE_PORT}"
-    environment:
-      - VIRTUAL_HOST=${AUTH_HOST}
-      - VIRTUAL_PORT=${AUTH_EXPOSE_PORT}
-      - DB_HOST=mongodb://auth_db/auth
-      - NODE_ENV
-      - JWT_SECRET
-      - AUTH_ROOT_USER_EMAIL
-      - AUTH_ROOT_USER_PASSWORD
-    volumes:
-      - ./auth/:/opt/app
-      - /opt/app/node_modules
-
-  auth_db:
-    image: "mongo"
-    volumes:
-      - ./.volumes/auth_db/:/data/db
-    expose:
-      - "${AUTH_DB_EXPOSE_PORT}"
-
   api:
     build:
       context: ./api

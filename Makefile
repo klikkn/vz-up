@@ -18,17 +18,11 @@ up:
 logs:
 	docker-compose logs -f -t
 
-start:
-	docker-compose start
+pause:
+	docker-compose pause
 
-stop:
-	docker-compose stop
-
-all:
-		docker-compose up nginx-proxy web auth auth_db api prisma api_db
-
-auth:
-		docker-compose up nginx-proxy auth auth_db
+unpause:
+	docker-compose unpause
 
 api:
 		docker-compose up nginx-proxy api prisma api_db
