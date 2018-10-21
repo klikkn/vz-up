@@ -6,7 +6,7 @@ config:
 build:
 		docker-compose build
 
-no-cache:
+build-f:
 		docker-compose build --no-cache
 
 down:
@@ -25,17 +25,8 @@ unpause:
 	docker-compose unpause
 
 api:
-		docker-compose up nginx-proxy api prisma api_db
-
-prisma-deploy:
-		docker-compose exec api npm run prisma deploy
-
-prisma-generate:
-		docker-compose exec api npm run prisma generate
-
-prisma-delete:
-		docker-compose exec api npm run prisma delete
+		docker-compose up -d nginx-proxy api prisma api_db
 
 web:
-		docker-compose up nginx-proxy web
+		docker-compose up -d nginx-proxy web
 

@@ -47,7 +47,7 @@ services:
       - /opt/app/node_modules
 
   prisma:
-    image: prismagraphql/prisma:1.16
+    image: prismagraphql/prisma:1.18
     restart: always
     expose:
       - "${PRISMA_EXPOSE_PORT}"
