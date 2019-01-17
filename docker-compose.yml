@@ -12,8 +12,6 @@ services:
   web:
     build:
       context: ./web
-    restart: always
-    command: "${WEB_START_COMMAND}"
     expose:
       - "${WEB_EXPOSE_PORT}"
     environment:
@@ -29,8 +27,6 @@ services:
   api:
     build:
       context: ./api
-    restart: always
-    command: sh -c '/usr/bin/wait-for.sh prisma:${PRISMA_EXPOSE_PORT} -- ${API_START_COMMAND}'
     expose:
       - "${API_EXPOSE_PORT}"
     environment:
@@ -47,7 +43,7 @@ services:
       - /opt/app/node_modules
 
   prisma:
-    image: prismagraphql/prisma:1.18
+    image: prismagraphql/prisma:${PRISMA_VERSION}
     restart: always
     expose:
       - "${PRISMA_EXPOSE_PORT}"

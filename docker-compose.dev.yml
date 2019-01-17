@@ -1,0 +1,10 @@
+version: '3'
+services:
+
+  web:
+    restart: always
+    command: "${WEB_DEV_START_COMMAND}"
+
+  api:
+    restart: always
+    command: /usr/bin/wait-for.sh prisma:${PRISMA_EXPOSE_PORT} -- ${API_TEST_START_COMMAND}

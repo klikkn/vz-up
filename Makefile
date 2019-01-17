@@ -13,7 +13,7 @@ down:
 		docker-compose down
 
 up:
-	docker-compose up -d
+	docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d
 
 logs:
 	docker-compose logs -f -t
@@ -25,7 +25,10 @@ unpause:
 	docker-compose unpause
 
 api:
-		docker-compose up -d nginx-proxy api prisma api_db
+		docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d nginx-proxy api prisma api_db
+
+api_test:
+		docker-compose -f docker-compose.yml -f docker-compose.test.yml up --abort-on-container-exit api prisma api_db
 
 web:
 		docker-compose up -d nginx-proxy web
